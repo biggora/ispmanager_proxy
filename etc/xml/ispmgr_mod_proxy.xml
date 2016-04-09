@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mgrdata>
+    <!-- Menu  level="admin+" -->
+    <mainmenu level="reseller+">
+        <node name="domains">
+            <node name="proxy" />
+        </node>
+        <node name="www">
+            <node name="proxy" />
+        </node>
+    </mainmenu>
+
+    <!-- Handlers -->
+    <handler name="proxy.php" type="cgi">
+        <func name="proxy" />
+        <func name="proxy.edit" />
+        <func name="proxy.delete" />
+        <func name="proxy.refresh" />
+        <func name="proxy.suspend"/>
+        <func name="proxy.resume"/>
+    </handler>
+
+    <!-- List -->
+    <metadata name="proxy" type="list" key="domain">
+        <toolbar view="buttontext">
+            <toolgrp name="new">
+                <toolbtn name="new" func="proxy.edit" type="new" img="t-new" sprite="yes"/>
+                <toolbtn name="edit" func="proxy.edit" type="edit" img="t-edit" default="yes"/>
+                <toolbtn name="delete" func="proxy.delete" type="group" img="t-delete" sprite="yes"/>
+                <toolbtn name="refresh" func="proxy.refresh" type="refresh" img="t-retry" sprite="yes"/>
+            </toolgrp>
+        </toolbar>
+        <!-- Colums -->
+        <coldata>
+            <col type="data" name="domain" convert="punycode" sort="alpha" sorted="-1"/>
+            <col type="data" name="owner" sort="alpha" level="reseller+"/>
+            <col type="data" name="redirect_type" sort="alpha"/>
+            <col type="prop" name="prop" sort="prop">
+                <xprop name="active" value="on" img="p-on" stat="yes" func="proxy.suspend" type="group"/>
+                <xprop name="active" value="off" img="p-off" stat="yes" func="proxy.resume" type="group"/>
+                <prop name="secure" img="p-ssl" stat="yes" sprite="yes" total="2"/>
+                <prop name="ddosshield" img="p-lt3" stat="yes" sprite="yes" total="2"/>
+            </col>
+            <col type="data" name="redirect_path" sort="alpha"/>
+        </coldata>
+    </metadata>
+
+    <!-- Form -->
+    <metadata name="proxy.edit" type="form">
+        <form title="title">
+            <page name="redirect" if="nginx">
+                <field name="domain">
+                    <input type="text" name="domain" required="yes" check="domain" setvalues="yes" convert="punycode" maxlength="253"/>
+                    <input type="hidden" name="currname"/>
+                    <input type="hidden" name="elid"/>
+                </field>
+                <field name="aliases">
+                    <input type="text" name="aliases" zoom="5" check="domain" checkargs="allowaster" convert="punycode"/>
+                </field>
+                <field name="ipaddrs">
+                    <select name="ipaddrs" source="webdomain.edit" type="multiple" required="yes"/>
+                </field>
+                <field name="owner" remove_if="edit" level="reseller+">
+                    <select name="owner" source="webdomain.edit" setvalues="yes" sorted="asc"/>
+                </field>
+                <field name="redirect_type">
+                    <select name="redirect_type" setvalues="yes" sorted="asc"/>
+                </field>
+                <field name="redirect_path">
+                    <input type="text" name="redirect_path" required="yes"/>
+                </field>
+                <field name="redirect_seo">
+                    <input type="text" name="redirect_seo"/>
+                </field>
+                <!-- SSL -->
+                <input type="hidden" name="limit_ssl" limit="yes">
+                    <if empty="yes" hide="secure" shadow="yes"/>
+                    <if empty="yes" hide="ssl_port"/>
+                    <if empty="yes" hide="ssl_cert"/>
+                </input>
+                <field name="secure">
+                    <input type="checkbox" name="secure" duty="ssl" maxlength="3">
+                        <if value="off" hide="ssl_port"/>
+                        <if value="off" hide="ssl_cert"/>
+                        <if value="off" hide="redirect_http"/>
+                        <if value="off" hide="strict_ssl"/>
+                    </input>
+                </field>
+                <field name="redirect_http">
+                    <input type="checkbox" name="redirect_http" maxlength="3"/>
+                </field>
+                <field name="strict_ssl">
+                    <input type="checkbox" name="strict_ssl" maxlength="3"/>
+                </field>
+                <field name="ssl_port">
+                    <input type="text" name="ssl_port" check="int" checkargs="1,65535"/>
+                </field>
+                <field name="ssl_cert">
+                    <select name="ssl_cert" maxlength="255"/>
+                </field>
+                <!-- DDOS -->
+                <field name="ddosshield">
+                    <input type="checkbox" name="ddosshield" maxlength="3">
+                        <if value="off" hide="ddospage"/>
+                    </input>
+                </field>
+            </page>
+
+            <page name="proxyrules" if="nginx">
+                <field name="rewrite_rules">
+                    <textarea name="rewrite_rules" rows="10"/>
+                </field>
+                <field name="proxy_rules">
+                    <textarea name="proxy_rules" rows="10"/>
+                </field>
+            </page>
+
+            <page name="ddospage" if="nginx">
+                <field name="fwddos" fullwidth="yes">
+                    <textdata name="wddos" type="msg" warning="yes"/>
+                </field>
+                <field name="nginx_limitrequest">
+                    <input type="text" name="nginx_limitrequest" check="int" checkargs="2,10000" setvalues="yes" required="yes"/>
+                </field>
+                <field name="nginx_burstrequest">
+                    <input type="text" name="nginx_burstrequest" check="int" checkargs="2,10000" required="yes"/>
+                </field>
+            </page>
+
+        </form>
+    </metadata>
+
+    <!-- Messages -->
+    <lang name="ru">
+        <messages name="desktop">
+            <msg name="menu_proxy">Прокси-сервер</msg>
+        </messages>
+        <messages name="proxy">
+            <msg name="title">Прокси-сервер</msg>
+            <msg name="owner">Owner</msg>
+            <msg name="hint_owner">Domain Owner</msg>
+            <msg name="domain">Domain</msg>
+            <msg name="hint_domain">WWW-Domain</msg>
+            <msg name="redirect_type">Redirect Type</msg>
+            <msg name="redirect_path">Redirect Path</msg>
+            <msg name="short_new" added="common">Создать</msg>
+            <msg name="short_edit">Редактировать</msg>
+            <msg name="hint_edit">Редактировать</msg>
+            <msg name="short_delete" added="common">Удалить</msg>
+            <msg name="hint_delete" added="common">Удалить</msg>
+            <msg name="hint_new" added="common">Создать</msg>
+            <msg name="name" added="common">Имя</msg>
+            <msg name="value" added="common">Значение</msg>
+            <msg name="hint_export">Сохранить в CSV</msg>
+            <msg name="hint_selectall">Выделить все элементы списка</msg>
+            <msg name="hint_reloadlist">Обновить данные</msg>
+            <msg name="hint_print">Открыть версию для печати</msg>
+            <msg name="hint_autoupdate_stop">Отменить автообновление текущего списка</msg>
+            <msg name="hint_takefavorite">Добавить в избранное меню</msg>
+            <msg name="hint_takeunfavorite">Убрать из избранного меню</msg>
+            <msg name="msg_tsetting">Настроить вид таблицы</msg>
+        </messages>
+        <messages name="proxy.edit">
+            <msg name="title">New Proxy WWW-Domain</msg>
+            <msg name="owner">Owner</msg>
+            <msg name="domain">WWW-Domain</msg>
+            <msg name="placeholder_domain">www.example.com</msg>
+            <msg name="aliases">Псевдонимы</msg>
+            <msg name="ipaddrs">IP-адрес</msg>
+            <msg name="redirect">Redirect</msg>
+            <msg name="proxyrules">Nginx Rules</msg>
+            <msg name="redirect_type">Redirect Type</msg>
+            <msg name="redirect_path">Redirect Path</msg>
+            <msg name="placeholder_redirect_path">10.10.10.10</msg>
+            <msg name="redirect_seo">SEO Redirect</msg>
+            <msg name="proxy_rules">Proxy Rules</msg>
+            <msg name="rewrite_rules">Nginx Directives</msg>
+            <msg name="secure">Защищенное соединение (SSL)</msg>
+            <msg name="hint_secure">Использовать защищенное соединение с WWW-доменом по протоколу HTTPs?</msg>
+            <msg name="ssl_cert">SSL certificate</msg>
+            <msg name="ssl_port">SSL port</msg>
+            <msg name="hint_ssl_port">Enter the port number that will be used for secure connection through HTTPs.</msg>
+            <msg name="strict_ssl">Advanced SSL security</msg>
+            <msg name="hint_strict_ssl">A web-server running in this mode cannot use insecure encryption algorithms, such as
+                SSLv1, SSLv2, and insecure connection algorithms. We do not recommend clearing this check box
+            </msg>
+            <msg name="redirect_http">Redirect HTTP-requests to HTTPS</msg>
+            <msg name="hint_redirect_http">Automatically redirect HTTP-requests to secure HTTPS</msg>
+            <msg name="hint_secure">Do you want to use secure connection with the WWW-domain through HTTPs?</msg>
+            <msg name="hint_ssl_cert">Choose an SSL certificate that will be used for this WWW-domain. You can choose an
+                existing certificate or create a new self-signed certificate
+            </msg>
+            <msg name="hint_ssl_port">Enter the port number that will be used for secure connection through HTTPs.</msg>
+            <msg name="ddospage">Anti-DDoS protection</msg>
+            <msg name="hint_nginx_limitrequest">Number of requests from one IP address per second</msg>
+            <msg name="hint_nginx_burstrequest">Maximum peak attack size</msg>
+            <msg name="wddos">&lt;b&gt;ATTENTION!&lt;b/&gt;&lt;br/&gt;With anti-DDoS protection activated, any IP address
+                will
+                be blocked.&lt;br/&gt;An IP address is blocked for 5 minutes on all ports.&lt;br/&gt;If your IP address was
+                blocked, wait until the timeout expires.
+            </msg>
+            <msg name="hint_ddosshield">Enable anti-DDoS protection using nginx mod_limit_req</msg>
+            <msg name="ddosshield">Enable anti-DDoS protection</msg>
+            <msg name="nginx_burstrequest">Maximum peak attack size</msg>
+            <msg name="nginx_limitrequest">Requests per second</msg>
+            <msg name="noredirect">No Redirect</msg>
+            <msg name="noflag">No flag</msg>
+            <msg name="last">Last</msg>
+            <msg name="break">Break</msg>
+            <msg name="redirect">Redirect</msg>
+            <msg name="permanent">Permanent</msg>
+            <msg name="proxy">Proxy</msg>
+        </messages>
+    </lang>
+    <lang name="en">
+        <messages name="desktop">
+            <msg name="menu_proxy">Proxy Server</msg>
+        </messages>
+        <messages name="proxy">
+            <msg name="title">Proxy Servers</msg>
+            <msg name="owner">Owner</msg>
+            <msg name="hint_owner">Domain Owner</msg>
+            <msg name="domain">Domain</msg>
+            <msg name="hint_domain">WWW-Domain</msg>
+            <msg name="redirect_type">Redirect Type</msg>
+            <msg name="redirect_path">Redirect Path</msg>
+            <msg name="short_new" added="common">Add</msg>
+            <msg name="short_edit">Edit</msg>
+            <msg name="hint_edit">Edit</msg>
+            <msg name="short_delete" added="common">Remove</msg>
+            <msg name="hint_delete" added="common">Remove</msg>
+            <msg name="hint_new" added="common">Create</msg>
+            <msg name="name" added="common">Name</msg>
+            <msg name="value" added="common">Value</msg>
+            <msg name="hint_export">Сохранить в CSV</msg>
+            <msg name="hint_selectall">Выделить все элементы списка</msg>
+            <msg name="hint_reloadlist">Обновить данные</msg>
+            <msg name="hint_print">Открыть версию для печати</msg>
+            <msg name="hint_autoupdate_stop">Отменить автообновление текущего списка</msg>
+            <msg name="hint_takefavorite">Добавить в избранное меню</msg>
+            <msg name="hint_takeunfavorite">Убрать из избранного меню</msg>
+            <msg name="msg_tsetting">Настроить вид таблицы</msg>
+        </messages>
+        <messages name="proxy.edit">
+            <msg name="title">New Proxy Server</msg>
+            <msg name="owner">Owner</msg>
+            <msg name="domain">WWW-Domain</msg>
+            <msg name="placeholder_domain">www.example.com</msg>
+            <msg name="aliases">Aliases</msg>
+            <msg name="ipaddrs">IP-address</msg>
+            <msg name="redirect">Redirect</msg>
+            <msg name="proxyrules">Nginx Rules</msg>
+            <msg name="redirect_type">Redirect Type</msg>
+            <msg name="redirect_path">Redirect Path</msg>
+            <msg name="placeholder_redirect_path">http://10.10.10.10/</msg>
+            <msg name="redirect_seo">SEO Redirect</msg>
+            <msg name="proxy_rules">Proxy Rules</msg>
+            <msg name="rewrite_rules">Nginx Directives</msg>
+            <msg name="secure">Защищенное соединение (SSL)</msg>
+            <msg name="hint_secure">Использовать защищенное соединение с WWW-доменом по протоколу HTTPs?</msg>
+            <msg name="ssl_cert">SSL certificate</msg>
+            <msg name="ssl_port">SSL port</msg>
+            <msg name="hint_ssl_port">Enter the port number that will be used for secure connection through HTTPs.</msg>
+            <msg name="strict_ssl">Advanced SSL security</msg>
+            <msg name="hint_strict_ssl">A web-server running in this mode cannot use insecure encryption algorithms, such as
+                SSLv1, SSLv2, and insecure connection algorithms. We do not recommend clearing this check box
+            </msg>
+            <msg name="redirect_http">Redirect HTTP-requests to HTTPS</msg>
+            <msg name="hint_redirect_http">Automatically redirect HTTP-requests to secure HTTPS</msg>
+            <msg name="hint_secure">Do you want to use secure connection with the WWW-domain through HTTPs?</msg>
+            <msg name="hint_ssl_cert">Choose an SSL certificate that will be used for this WWW-domain. You can choose an
+                existing certificate or create a new self-signed certificate
+            </msg>
+            <msg name="hint_ssl_port">Enter the port number that will be used for secure connection through HTTPs.</msg>
+            <msg name="ddospage">Anti-DDoS protection</msg>
+            <msg name="hint_nginx_limitrequest">Number of requests from one IP address per second</msg>
+            <msg name="hint_nginx_burstrequest">Maximum peak attack size</msg>
+            <msg name="wddos">&lt;b&gt;ATTENTION!&lt;b/&gt;&lt;br/&gt;With anti-DDoS protection activated, any IP address
+                will be blocked.&lt;br/&gt;An IP address is blocked for 5 minutes on all ports.&lt;br/&gt;If your IP address was
+                blocked, wait until the timeout expires.
+            </msg>
+            <msg name="hint_ddosshield">Enable anti-DDoS protection using nginx mod_limit_req</msg>
+            <msg name="ddosshield">Enable anti-DDoS protection</msg>
+            <msg name="nginx_burstrequest">Maximum peak attack size</msg>
+            <msg name="nginx_limitrequest">Requests per second</msg>
+            <msg name="noredirect">No Redirect</msg>
+            <msg name="noflag">No flag</msg>
+            <msg name="last">Last</msg>
+            <msg name="break">Break</msg>
+            <msg name="redirect">Redirect</msg>
+            <msg name="permanent">Permanent</msg>
+            <msg name="proxy">Proxy</msg>
+        </messages>
+    </lang>
+</mgrdata>
