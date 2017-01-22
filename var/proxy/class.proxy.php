@@ -289,7 +289,11 @@ Class Proxy extends DataBase
         return $res;
     }
 
-
+    /**
+     * Get Param by name
+     * @param $name
+     * @return mixed
+     */
     function getParam($name)
     {
         return $this->$name;
@@ -378,6 +382,11 @@ Class Proxy extends DataBase
         return $files;
     }
 
+    /**
+     * Create Nginx vhost configuration
+     * @param $data
+     * @return string
+     */
     function createNginxConfig($data)
     {
         $nginxFileName = $data['domain'] . ".conf";
@@ -481,13 +490,23 @@ Class Proxy extends DataBase
             $putOut .= "}\n\n";
         }
 
-        file_put_contents($nginxFolder . '/'.$nginxFileName, $putOut);
-        exec('nginx -s reload');
-
-        return $putOut;
+        file_put_contents($nginxFolder . '/' . $nginxFileName, $putOut);
+        exec('nginx -t', $output, $status);
+        if ((int)$status === 0) {
+            exec('nginx -s reload');
+            return '';
+        } else {
+            $this->removeNginxConfig($data);
+            return $output;
+        }
     }
 
-    function removeNginxConfig($data){
+    /**
+     * Remove nginx vhost configuration files
+     * @param $data
+     */
+    function removeNginxConfig($data)
+    {
         $nginxFileName = $data['domain'] . ".conf";
         $nginxFolder = "/etc/nginx/vhosts/" . $data['owner'];
         $ownerFolder = '/var/www/' . $data['owner'] . '/data/www/' . $data['domain'];
@@ -501,9 +520,48 @@ Class Proxy extends DataBase
         }
     }
 
-    function writeSSL($data)
+    /**
+     * Create Log rotate config
+     * @param $data
+     */
+    function createLogrotationConfig($data)
     {
+        $logName = '/etc/logrotate.d/web/' . $data['domain'];
+        $lConfig = '/var/www/httpd-logs/' . $data['domain'] . '.access.log {' . "\n";
+        $lConfig .= '   olddir /var/www/' . $data['owner'] . '/data/logs' . "\n";
+        $lConfig .= '   rotate 10' . "\n";
+        $lConfig .= '   daily' . "\n";
+        $lConfig .= '   copytruncate' . "\n";
+        $lConfig .= '   compress' . "\n";
+        $lConfig .= '}' . "\n\n";
+        $lConfig .= '/var/www/httpd-logs/' . $data['domain'] . '.error.log {' . "\n";
+        $lConfig .= '   olddir /var/www/' . $data['owner'] . '/data/logs' . "\n";
+        $lConfig .= '   rotate 10' . "\n";
+        $lConfig .= '   daily' . "\n";
+        $lConfig .= '   copytruncate' . "\n";
+        $lConfig .= '   compress' . "\n";
+        $lConfig .= '}' . "\n";
 
+        file_put_contents($logName, $lConfig);
+        exec('logrotate -v -f ' . $logName, $output, $status);
+        if ((int)$status === 0) {
+            return '';
+        } else {
+            $this->removeLogrotationConfig($data);
+            return $output;
+        }
+    }
+
+    /**
+     * Remove Log rotate config
+     * @param $data
+     */
+    function removeLogrotationConfig($data)
+    {
+        $logName = '/etc/logrotate.d/web/' . $data['domain'];
+        if (!file_exists($logName)) {
+            unlink($logName);
+        }
     }
 }
 

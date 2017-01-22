@@ -58,6 +58,7 @@ switch ($func) {
 
         /*
          * <ipaddrs>10.10.10.20</ipaddrs>
+         * <ok/><error type="value" object="django_name" lang="ru"><msg>Поле "Имя проекта Django" заполнено не верно</msg></error>
          */
 
         if ($ok === 'ok') {
@@ -70,7 +71,8 @@ switch ($func) {
                 $mgr->UpdateProxy($row);
             }
             $tocreate = $mgr->GetProxy($row->domain);
-            $mgr->createNginxConfig($tocreate);
+            $err = $mgr->createNginxConfig($tocreate);
+            $mgr->createLogrotationConfig($tocreate);
             $xml = $mgr->getOk();
         } else {
             $xml = $mgr->getProxiesFormPage($elid , $owner);
