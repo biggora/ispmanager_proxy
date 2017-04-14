@@ -497,8 +497,7 @@ Class Proxy extends DataBase
             $putOut .= '    return 301 http://' . $data['domain'] . ':' . $data['ssl_port'] . '$request_uri permanent;' . "\n";
             $putOut .= "}\n\n";
         }
-        $this->writeNginxConfig($nginxFolder, $nginxFileName, $data, $putOut,true);
-        // file_put_contents($nginxFolder . '/' . $nginxFileName, $putOut);
+        $this->writeNginxConfig($nginxFolder, $nginxFileName, $putOut, true);
         exec('nginx -t', $output, $status);
         if ((int)$status === 0) {
             exec('nginx -s reload');
@@ -517,10 +516,12 @@ Class Proxy extends DataBase
      * @param $putOut
      * @param bool $reset
      */
-    function writeNginxConfig($nginxFolder, $nginxFileName, $data, $putOut, $reset = true)
+    function writeNginxConfig($nginxFolder, $nginxFileName, $putOut, $reset = true)
     {
         if ($reset) {
-            $this->removeNginxConfig($data);
+            if (!file_exists($nginxFolder . '/' . $nginxFileName)) {
+                unlink($nginxFolder . '/' . $nginxFileName);
+            }
         }
         file_put_contents($nginxFolder . '/' . $nginxFileName, $putOut);
     }
