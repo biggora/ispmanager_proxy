@@ -392,6 +392,7 @@ Class Proxy extends DataBase
         $nginxFileName = $data['domain'] . ".conf";
         $nginxFolder = "/etc/nginx/vhosts/" . $data['owner'];
         $ownerFolder = '/var/www/' . $data['owner'] . '/data/www/' . $data['domain'];
+        $letsFolder = $ownerFolder . '/.well-known';
         $upstreamName = "proxy_" . $data['owner'] . "_" . $data['id'];
         $ipaddrs = explode(",", $data['ipaddrs']);
         $aliases = implode(" ", explode("\n", $data['aliases']));
@@ -406,6 +407,9 @@ Class Proxy extends DataBase
             mkdir($ownerFolder, 0644, true);
             chown($ownerFolder, $data['owner']);
             chgrp($ownerFolder, $data['owner']);
+        }
+        if (!file_exists($letsFolder)) {
+            mkdir($letsFolder, 0644, true);
         }
 
         $putOut = "#user '" . $data['owner'] . "' proxy host '" . $data['domain'] . "' configuration file";
@@ -460,6 +464,10 @@ Class Proxy extends DataBase
             $putOut .= "        " . $data['proxy_rules'];
             $putOut .= "    }\n\n";
 
+            $putOut .= "    location ^~ /.well-known {\n";
+            $putOut .= "        alias /var/www/" . $data['owner'] . "/data/www/" . $data['domain'] . "/.well-known;\n";
+            $putOut .= "    }\n\n";
+
             $putOut .= "        " . $data['rewrite_rules'];
             $putOut .= "\n\n";
 
@@ -489,8 +497,8 @@ Class Proxy extends DataBase
             $putOut .= '    return 301 http://' . $data['domain'] . ':' . $data['ssl_port'] . '$request_uri permanent;' . "\n";
             $putOut .= "}\n\n";
         }
-
-        file_put_contents($nginxFolder . '/' . $nginxFileName, $putOut);
+        $this->writeNginxConfig($nginxFolder, $nginxFileName, $data, $putOut,true);
+        // file_put_contents($nginxFolder . '/' . $nginxFileName, $putOut);
         exec('nginx -t', $output, $status);
         if ((int)$status === 0) {
             exec('nginx -s reload');
@@ -499,6 +507,22 @@ Class Proxy extends DataBase
             $this->removeNginxConfig($data);
             return $output;
         }
+    }
+
+    /**
+     * Write Nginx Config
+     * @param $nginxFolder
+     * @param $nginxFileName
+     * @param $data
+     * @param $putOut
+     * @param bool $reset
+     */
+    function writeNginxConfig($nginxFolder, $nginxFileName, $data, $putOut, $reset = true)
+    {
+        if ($reset) {
+            $this->removeNginxConfig($data);
+        }
+        file_put_contents($nginxFolder . '/' . $nginxFileName, $putOut);
     }
 
     /**

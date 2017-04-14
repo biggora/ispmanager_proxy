@@ -17,7 +17,6 @@ class Logger
     var $_path_to_logs = '/var/log/';
     var $_log_file_name = 'proxy.log';
 
-
     function __construct()
     {
 

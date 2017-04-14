@@ -88,7 +88,7 @@ Class DataBase extends Logger
         if ($this->_limit > 0 || $this->_offset > 0) {
             $sql .= ' LIMIT ' . $this->_offset . ', ' . $this->_limit;
         }
-        if($this->_debug) {
+        if ($this->_debug) {
             $this->writeLog($sql);
         }
         $this->_cursor = $this->_db->query($sql);
