@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @revision       $Id: class.logger.php 94 2010-08-16 18:18:47Z aleks $
  * @version        1.0.0 proxy plugin $

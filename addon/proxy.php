@@ -18,7 +18,7 @@ $owner = getenv('PARAM_owner');
 $sqtr = urldecode($sqtr);
 parse_str($sqtr, $params);
 
-if(isset($params['elid'])) {
+if (isset($params['elid'])) {
     $elid = $params['elid'];
 }
 
@@ -32,7 +32,7 @@ switch ($func) {
 
         $row = new stdClass();
 
-        if(isset($owner) && is_string($owner) && $owner !== '') {
+        if (isset($owner) && is_string($owner) && $owner !== '') {
             $row->owner = $owner;
         }
         $row->domain = getenv('PARAM_domain');
@@ -75,7 +75,7 @@ switch ($func) {
             $mgr->createLogrotationConfig($tocreate);
             $xml = $mgr->getOk();
         } else {
-            $xml = $mgr->getProxiesFormPage($elid , $owner);
+            $xml = $mgr->getProxiesFormPage($elid, $owner);
         }
         break;
     case 'proxy.delete':

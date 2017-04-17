@@ -290,6 +290,23 @@ Class Proxy extends DataBase
     }
 
     /**
+     * Update LetsEncrypt SSL
+     *
+     * @param string $domain
+     * @return bool|mixed
+     */
+    function updateLetsEncryptSSL($domain = '')
+    {
+        $this->writeLog('remove domain: ' . $domain . ' ' . is_string($domain) . ' ' . ($domain !== ''));
+        $res = false;
+        if (is_string($domain) && $domain !== '') {
+            $this->_sql = 'UPDATE letsencrypt_ssl SET can_renew = "on" WHERE domain = "' . $domain . '"';
+            $res = $this->query();
+        }
+        return $res;
+    }
+
+    /**
      * Get Param by name
      * @param $name
      * @return mixed
@@ -440,6 +457,7 @@ Class Proxy extends DataBase
                     $putOut .= "    ssl_prefer_server_ciphers on;\n";
                     $putOut .= "    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;\n";
                 }
+                $this->updateLetsEncryptSSL($data['domain']);
             } else {
                 foreach ($ipaddrs as $ipk => $ipaddr) {
                     $putOut .= "    listen " . trim($ipaddr) . ":80;\n";
@@ -497,6 +515,7 @@ Class Proxy extends DataBase
             $putOut .= '    return 301 http://' . $data['domain'] . ':' . $data['ssl_port'] . '$request_uri permanent;' . "\n";
             $putOut .= "}\n\n";
         }
+
         $this->writeNginxConfig($nginxFolder, $nginxFileName, $putOut, true);
         exec('nginx -t', $output, $status);
         if ((int)$status === 0) {

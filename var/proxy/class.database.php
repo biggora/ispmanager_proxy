@@ -285,7 +285,6 @@ Class DataBase extends Logger
         return $this->query();
     }
 
-
     /**
      * Description
      *
