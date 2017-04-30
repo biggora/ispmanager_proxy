@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @revision  $Id: class.proxy.php 60 2016-04-01 12:47:26Z aleks $
  * @version  1.0.0 proxy plugin $
@@ -466,9 +465,12 @@ Class Proxy extends DataBase
 
             $putOut .= "    server_name " . $data['domain'] . " " . $aliases . ";\n";
             $putOut .= "    charset UTF-8;\n\n";
+
             $putOut .= '    set $root_path /var/www/' . $data['owner'] . '/data/www/' . $data['domain'] . ';' . "\n";
-            $putOut .= '    disable_symlinks if_not_owner from=$root_path;' . "\n";
-            $putOut .= "    index index.html index.php;\n";
+            $putOut .= '    disable_symlinks if_not_owner from=$root_path;' . "\n\n";
+
+            $putOut .= "    include /etc/nginx/vhosts-includes/*.conf;\n\n";
+
             $putOut .= '    root $root_path;' . "\n";
             $putOut .= "    index index.html index.php;\n\n";
 
