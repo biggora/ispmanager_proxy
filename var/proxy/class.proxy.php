@@ -484,9 +484,9 @@ Class Proxy extends DataBase
             $putOut .= "        " . $data['proxy_rules'] . "\n";
             $putOut .= "    }\n\n";
 
-//            $putOut .= "    location ^~ /.well-known {\n";
-//            $putOut .= "        alias /var/www/" . $data['owner'] . "/data/www/" . $data['domain'] . "/.well-known;\n";
-//            $putOut .= "    }\n\n";
+            $putOut .= "    location ^~ /.well-known/acme-challenge/ {\n";
+            $putOut .= "        alias /usr/local/mgr5/www/letsencrypt/\n";
+            $putOut .= "    }\n\n";
 
             $putOut .= "        " . $data['rewrite_rules'];
             $putOut .= "\n\n";
