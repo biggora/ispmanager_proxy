@@ -481,12 +481,12 @@ Class Proxy extends DataBase
             $putOut .= "        include /etc/nginx/proxy-includes/*.conf;\n\n";
             $putOut .= "        proxy_pass http://" . $upstreamName . "/;\n";
             $putOut .= "        proxy_redirect off;\n";
-            $putOut .= "        " . $data['proxy_rules'];
+            $putOut .= "        " . $data['proxy_rules'] . "\n";
             $putOut .= "    }\n\n";
 
-            $putOut .= "    location ^~ /.well-known {\n";
-            $putOut .= "        alias /var/www/" . $data['owner'] . "/data/www/" . $data['domain'] . "/.well-known;\n";
-            $putOut .= "    }\n\n";
+//            $putOut .= "    location ^~ /.well-known {\n";
+//            $putOut .= "        alias /var/www/" . $data['owner'] . "/data/www/" . $data['domain'] . "/.well-known;\n";
+//            $putOut .= "    }\n\n";
 
             $putOut .= "        " . $data['rewrite_rules'];
             $putOut .= "\n\n";
@@ -557,11 +557,11 @@ Class Proxy extends DataBase
         $nginxFolder = "/etc/nginx/vhosts/" . $data['owner'];
         $ownerFolder = '/var/www/' . $data['owner'] . '/data/www/' . $data['domain'];
 
-        if (!file_exists($nginxFolder . '/' . $nginxFileName)) {
+        if (file_exists($nginxFolder . '/' . $nginxFileName)) {
             unlink($nginxFolder . '/' . $nginxFileName);
             exec('nginx -s reload');
         }
-        if (!file_exists($ownerFolder)) {
+        if (file_exists($ownerFolder)) {
             unlink($ownerFolder);
         }
     }

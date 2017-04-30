@@ -148,6 +148,8 @@
             <msg name="hint_edit">Редактировать</msg>
             <msg name="short_delete" added="common">Удалить</msg>
             <msg name="hint_delete" added="common">Удалить</msg>
+            <msg name="short_refresh" added="common">Обновить</msg>
+            <msg name="hint_refresh" added="common">Обновить</msg>
             <msg name="hint_new" added="common">Создать</msg>
             <msg name="name" added="common">Имя</msg>
             <msg name="value" added="common">Значение</msg>
@@ -229,6 +231,8 @@
             <msg name="hint_edit">Edit</msg>
             <msg name="short_delete" added="common">Remove</msg>
             <msg name="hint_delete" added="common">Remove</msg>
+            <msg name="short_refresh" added="common">Refresh</msg>
+            <msg name="hint_refresh" added="common">Refresh</msg>
             <msg name="hint_new" added="common">Create</msg>
             <msg name="name" added="common">Name</msg>
             <msg name="value" added="common">Value</msg>
