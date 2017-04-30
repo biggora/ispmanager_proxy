@@ -469,7 +469,7 @@ Class Proxy extends DataBase
             $putOut .= '    set $root_path /var/www/' . $data['owner'] . '/data/www/' . $data['domain'] . ';' . "\n";
             $putOut .= '    disable_symlinks if_not_owner from=$root_path;' . "\n\n";
 
-            $putOut .= "    include /etc/nginx/vhosts-includes/*.conf;\n\n";
+            /** $putOut .= "    include /etc/nginx/vhosts-includes/*.conf;\n\n"; **/
 
             $putOut .= '    root $root_path;' . "\n";
             $putOut .= "    index index.html index.php;\n\n";
@@ -485,7 +485,7 @@ Class Proxy extends DataBase
             $putOut .= "    }\n\n";
 
             $putOut .= "    location ^~ /.well-known/acme-challenge/ {\n";
-            $putOut .= "        alias /usr/local/mgr5/www/letsencrypt/\n";
+            $putOut .= "        alias /usr/local/mgr5/www/letsencrypt/;\n";
             $putOut .= "    }\n\n";
 
             $putOut .= "        " . $data['rewrite_rules'];
