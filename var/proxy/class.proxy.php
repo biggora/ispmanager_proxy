@@ -296,7 +296,7 @@ Class Proxy extends DataBase
      */
     function updateLetsEncryptSSL($domain = '')
     {
-        $this->writeLog('remove domain: ' . $domain . ' ' . is_string($domain) . ' ' . ($domain !== ''));
+        $this->writeLog('update LetsEncrypt SSL domain: ' . $domain . ' ' . is_string($domain) . ' ' . ($domain !== ''));
         $res = false;
         if (is_string($domain) && $domain !== '') {
             $this->_sql = 'UPDATE letsencrypt_ssl SET can_renew = "on" WHERE domain = "' . $domain . '"';
